@@ -8,6 +8,8 @@ largoPuente = 20
 
 cantVacas = 5
 
+mutexVaca = threading.Semaphore(1)
+
 class Vaca(threading.Thread):
   def __init__(self):
     super().__init__()
@@ -23,7 +25,15 @@ class Vaca(threading.Thread):
 
   def run(self):
     while(True):
-      self.avanzar()
+      while self.posicion < inicioPuente:
+        self.avanzar()
+
+      while (self.posicion >= inicioPuente) & (self.posicion < (largoPuente + inicioPuente)):
+        mutexVaca.acquire()
+        try:
+          self.avanzar()
+        finally:
+          mutexVaca.release()
 
 vacas = []
 for i in range(cantVacas):
